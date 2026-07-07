@@ -2,6 +2,8 @@ import os
 import requests
 from dotenv import load_dotenv
 
+from models.company import CompanyProfile
+
 load_dotenv()
 
 
@@ -31,4 +33,16 @@ class CompaniesHouseClient:
         )
 
         response.raise_for_status()
-        return response.json()
+
+        data = response.json()
+
+        return CompanyProfile(
+            company_name=data["company_name"],
+            company_number=data["company_number"],
+            status=data.get("company_status"),
+            incorporation_date=data.get("date_of_creation"),
+            sic_codes=data.get("sic_codes", []),
+            registered_address=str(
+                data.get("registered_office_address", {})
+            )
+        )

@@ -2,7 +2,8 @@ from sources.companies_house import CompaniesHouseClient
 
 client = CompaniesHouseClient()
 
-results = client.search_company("Monzo")
+company = client.get_company("09446231")
 
-for company in results["items"]:
-    print(company["title"])
+print(company)
+print(company.company_name)
+print(company.sic_codes)
