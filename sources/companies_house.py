@@ -3,6 +3,7 @@ import requests
 from dotenv import load_dotenv
 
 from models.company import CompanyProfile
+from models.company_search import CompanySearchResult
 
 load_dotenv()
 
@@ -24,7 +25,18 @@ class CompaniesHouseClient:
         )
 
         response.raise_for_status()
-        return response.json()
+
+        data = response.json()
+
+        return [
+        CompanySearchResult(
+            company_name=item["title"],
+            company_number=item["company_number"],
+            company_status=item.get("company_status"),
+            company_type=item.get("company_type")
+        )
+        for item in data.get("items", [])
+    ]
 
     def get_company(self, company_number: str):
         response = requests.get(

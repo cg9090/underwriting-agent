@@ -1,9 +1,23 @@
-from sources.companies_house import CompaniesHouseClient
+# from sources.companies_house import CompaniesHouseClient
 
-client = CompaniesHouseClient()
+# client = CompaniesHouseClient()
 
-company = client.get_company("09446231")
+# company = client.get_company("09446231")
 
-print(company)
-print(company.company_name)
-print(company.sic_codes)
+# print(company)
+# print(company.company_name)
+# print(company.sic_codes)
+
+from sources.duckduckgo import DuckDuckGoClient
+
+
+client = DuckDuckGoClient()
+
+results = client.search(
+    "LinkedIn official website"
+)
+
+for result in results:
+    print(result["title"])
+    print(result["href"])
+    print("---")
