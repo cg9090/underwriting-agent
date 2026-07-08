@@ -8,16 +8,27 @@
 # print(company.company_name)
 # print(company.sic_codes)
 
-from sources.duckduckgo import DuckDuckGoClient
+# from sources.duckduckgo import DuckDuckGoClient
 
 
-client = DuckDuckGoClient()
+# client = DuckDuckGoClient()
 
-results = client.search(
-    "LinkedIn official website"
+# results = client.search(
+#     "LinkedIn official website"
+# )
+
+# for result in results:
+#     print(result["title"])
+#     print(result["href"])
+#     print("---")
+
+from sources.scraper import WebsiteScraper
+
+
+scraper = WebsiteScraper()
+
+text = scraper.scrape(
+    "https://monzo.com"
 )
 
-for result in results:
-    print(result["title"])
-    print(result["href"])
-    print("---")
+print(text[:1000])
