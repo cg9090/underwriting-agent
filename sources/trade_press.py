@@ -1,6 +1,6 @@
 from sources.duckduckgo import DuckDuckGoClient
 from sources.scraper import WebsiteScraper
-from models.trade_press import TradePressArticle
+from models.article import Article
 
 class TradePressClient:
 
@@ -46,7 +46,7 @@ class TradePressClient:
             if page["success"]:
 
                 scraped_articles.append(
-                    TradePressArticle(
+                    Article(
                         title=article["title"],
                         url=article["href"],
                         content=page["content"],

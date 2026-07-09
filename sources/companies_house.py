@@ -44,6 +44,9 @@ class CompaniesHouseClient:
             auth=(self.api_key, "")
         )
 
+        if response.status_code == 404:
+            return None
+        
         response.raise_for_status()
 
         data = response.json()

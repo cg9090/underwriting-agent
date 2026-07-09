@@ -1,3 +1,4 @@
+from models.article import Article
 from sources.duckduckgo import DuckDuckGoClient
 from sources.scraper import WebsiteScraper
 
@@ -56,12 +57,12 @@ class CompetitiveLandscapeClient:
             if page["success"]:
 
                 research_articles.append(
-                    {
-                        "title": article["title"],
-                        "url": article["href"],
-                        "content": page["content"],
-                        "source": article.get("source", "Web Search")
-                    }
+                    Article(
+                        title=article["title"],
+                        url=article["href"],
+                        content=page["content"],
+                        source=article.get("source")
+                    )
                 )
 
 
