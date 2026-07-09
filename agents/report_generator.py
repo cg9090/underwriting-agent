@@ -25,14 +25,21 @@ class ReportGenerator:
 
         for item in state.evidence:
 
+            quote_section = ""
+
+            if item.quote:
+                quote_section = f"""
+Quote:
+{item.quote}
+"""
+
             evidence += f"""
 Category: {item.category}
 
 Claim:
 {item.claim}
 
-Quote:
-{item.quote}
+{quote_section}
 
 Source:
 {item.source}
