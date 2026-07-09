@@ -1,5 +1,6 @@
 from sources.duckduckgo import DuckDuckGoClient
 from sources.scraper import WebsiteScraper
+from models.trade_press import TradePressArticle
 
 class TradePressClient:
 
@@ -45,12 +46,12 @@ class TradePressClient:
             if page["success"]:
 
                 scraped_articles.append(
-                    {
-                        "title": article["title"],
-                        "url": article["href"],
-                        "content": page["content"],
-                        "source": article.get("source")
-                    }
+                    TradePressArticle(
+                        title=article["title"],
+                        url=article["href"],
+                        content=page["content"],
+                        source=article.get("source")
+                    )
                 )
 
         return scraped_articles
