@@ -1,3 +1,4 @@
+from models.evidence import Evidence
 from models.research import ResearchState
 
 from sources.companies_house import CompaniesHouseClient
@@ -10,6 +11,7 @@ from sources.scraper import WebsiteScraper
 from agents.evidence_builder import EvidenceBuilder
 from agents.report_generator import ReportGenerator
 
+from services.llm_extractor import LLMEvidenceExtractor
 
 class UnderwritingAgent:
 
@@ -25,7 +27,9 @@ class UnderwritingAgent:
 
         self.competition = CompetitiveLandscapeClient()
 
-        self.evidence_builder = EvidenceBuilder()
+        extractor = LLMEvidenceExtractor()
+
+        self.evidence_builder = EvidenceBuilder(extractor)
 
         self.report_generator = ReportGenerator()
 
@@ -35,10 +39,7 @@ class UnderwritingAgent:
         company_input: str
     ):
 
-        # ------------------------
-        # Resolve Company
-        # ------------------------
-
+        # Step 1: Resolve Company
         if company_input.isdigit():
 
             company = self.company_house.get_company(
@@ -47,35 +48,25 @@ class UnderwritingAgent:
 
         else:
 
-            matches = self.company_house.search_company(
-                company_input
-            )
+            matches = self.company_house.search_company(company_input)
 
             if len(matches) == 0:
 
-                raise ValueError(
-                    "Company not found."
-                )
-
+                return f"No companies found matching '{company_input}'."
 
             if len(matches) > 1:
 
-                print("Multiple companies found:")
-
-                for company in matches:
-
-                    print(
-                        company.company_name,
-                        company.company_number
-                    )
-
-                raise ValueError(
-                    "Company name is ambiguous. Please provide a company number."
+                selected_company = self.choose_company(
+                    matches
                 )
+
+            else:
+
+                selected_company = matches[0]
 
 
             company = self.company_house.get_company(
-                matches[0].company_number
+                selected_company.company_number
             )
 
         state = ResearchState(company_name=company.company_name)
@@ -114,6 +105,16 @@ class UnderwritingAgent:
                 )
 
             )
+        else:
+            state.evidence.append(
+                Evidence(
+                    claim="Official company website could not be verified",
+                    category="business_model",
+                    source="Website Finder",
+                    confidence=0.0,
+                    limitations="No reliable official website found"
+                )
+            )
 
         # ------------------------
         # Trade Press
@@ -123,6 +124,17 @@ class UnderwritingAgent:
             company.company_name
         )
 
+        if len(articles) == 0:
+
+            state.evidence.append(
+                self.evidence_builder.create_evidence(
+                    claim="No usable trade press sources were retrieved",
+                    category="quality_signal",
+                    source="Trade Press Search",
+                    confidence=1.0
+                )
+            )
+        
         for article in articles:
 
             state.evidence.extend(
@@ -154,12 +166,31 @@ class UnderwritingAgent:
         # ------------------------
         # Final Report
         # ------------------------
-        print(state.evidence)
 
-        for item in state.evidence:
-            print(type(item))
-        report = self.report_generator.generate(
-            state
+
+        # report = self.report_generator.generate(
+        #     state
+        # )
+
+        return state
+    
+    def choose_company(self, matches):
+
+        print("\nMultiple companies found:\n")
+
+        for index, company in enumerate(matches):
+
+            print(
+                f"{index}: "
+                f"{company.company_name} | "
+                f"{company.company_number} | "
+                f"{company.company_status}"
+            )
+
+
+        choice = int(
+            input("\nSelect company number: ")
         )
 
-        return report
+
+        return matches[choice]

@@ -1,8 +1,11 @@
 from models.evidence import Evidence
-from models.trade_press import TradePressArticle
+from models.article import Article
 from models.website import WebsiteContent
 
 class EvidenceBuilder:
+
+    def __init__(self, extractor):
+        self.extractor = extractor
 
     def from_company_profile(self, company):
 
@@ -43,20 +46,31 @@ class EvidenceBuilder:
 
     def from_trade_press(
         self,
-        article: TradePressArticle
+        article: Article
     ):
+        result = self.extractor.extract(
+            text=article.content,
+            category="quality_signal"
+        )
+
+        if result.error:
+            return []
+        
         evidence = []
 
-        evidence.append(
-            Evidence(
-                claim=article.title,
-                category="quality_signal",
-                source=article.source or "Trade Press",
-                url=article.url,
-                quote=article.content[:300],
-                confidence=0.7
+        for claim in result.claims:
+
+            evidence.append(
+                Evidence(
+                    claim=claim["claim"],
+                    category="quality_signal",
+                    source=article.source or "Trade Press",
+                    url=article.url,
+                    quote=claim["quote"],
+                    confidence=claim["confidence"],
+                    limitations=claim.get("limitations")
+                )
             )
-        )
         
         return evidence
     
@@ -82,20 +96,50 @@ class EvidenceBuilder:
     
     def from_competition(
     self,
-    article
+    article: Article
     ):
-
+        result = self.extractor.extract(
+            text=article.content,
+            category="competitive_landscape"
+        )
+        
+        if result.error:
+            return []
+        
         evidence = []
 
-        evidence.append(
-            Evidence(
-                claim=f"Competitive information identified from article: {article['title']}",
-                category="competitive_landscape",
-                source=article.get("source", "Trade Press"),
-                url=article.get("url"),
-                quote=article.get("content", "")[:500],
-                confidence=0.6
+        for claim in result.claims:
+            evidence.append(
+                Evidence(
+                    claim=claim["claim"],
+                    category="competitive_landscape",
+                    source=article.source or "Trade Press",
+                    url=article.url,
+                    quote=claim["quote"],
+                    confidence=claim["confidence"],
+                    limitations=claim.get("limitations")
+                )
             )
-        )
-
+        
         return evidence
+    
+    def create_evidence(
+        self,
+        claim: str,
+        category: str,
+        source: str,
+        url: str = None,
+        quote: str = None,
+        confidence: float = 0.5,
+        limitations: str = None
+    ):
+
+        return Evidence(
+            claim=claim,
+            category=category,
+            source=source,
+            url=url,
+            quote=quote,
+            confidence=confidence,
+            limitations=limitations
+        )

@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 from models.research import ResearchState
 
+from llm.claude import LLMClient
+
 load_dotenv()
 
 
@@ -12,9 +14,7 @@ class ReportGenerator:
 
     def __init__(self):
 
-        self.client = Anthropic(
-            api_key=os.getenv("ANTHROPIC_API_KEY")
-        )
+        self.client = LLMClient()
 
     def generate(
         self,
@@ -110,15 +110,6 @@ Mention conflicting evidence.
 List all sources used.
 """
 
-        response = self.client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=2000,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
+        response = self.client.generate(text=prompt)
 
-        return response.content[0].text
+        return response
