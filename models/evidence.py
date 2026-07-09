@@ -6,5 +6,6 @@ class Evidence(BaseModel):
     claim: str
     source: str
     url: Optional[str] = None
+    quote: Optional[str] = None
     category: str
     confidence: float
