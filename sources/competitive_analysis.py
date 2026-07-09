@@ -45,7 +45,7 @@ class CompetitiveLandscapeClient:
 
 
         # Scrape first 5
-        evidence_sources = []
+        research_articles = []
 
         for article in unique_articles[:5]:
 
@@ -55,13 +55,14 @@ class CompetitiveLandscapeClient:
 
             if page["success"]:
 
-                evidence_sources.append(
+                research_articles.append(
                     {
                         "title": article["title"],
                         "url": article["href"],
-                        "content": page["content"]
+                        "content": page["content"],
+                        "source": article.get("source", "Web Search")
                     }
                 )
 
 
-        return evidence_sources
+        return research_articles
