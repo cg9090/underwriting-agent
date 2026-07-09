@@ -19,7 +19,7 @@ class LLMEvidenceExtractor:
         prompt = f"""
 You are an evidence extraction system.
 
-Extract factual claims from the following source.
+Extract up to 5 of the most important factual claims from the following source.
 
 Rules:
 - Only use information explicitly stated in the text.
@@ -89,7 +89,7 @@ Source text:
         try:
 
             claims = json.loads(cleaned)
-
+            claims = claims[:5]
             return ExtractionResult(
                 claims=claims
             )

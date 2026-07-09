@@ -39,12 +39,15 @@ class UnderwritingAgent:
         company_input: str
     ):
 
-        # Step 1: Resolve Company
+        # Step 1: Resolve Company and gather Company House information
         if company_input.isdigit():
 
             company = self.company_house.get_company(
                 company_input
             )
+
+            if company is None:
+                return f"No company found with number '{company_input}'."
 
         else:
 
@@ -72,10 +75,6 @@ class UnderwritingAgent:
         state = ResearchState(company_name=company.company_name)
         state.company = company
 
-        # ------------------------
-        # Companies House Evidence
-        # ------------------------
-
         state.evidence.extend(
 
             self.evidence_builder.from_company_profile(
@@ -84,10 +83,7 @@ class UnderwritingAgent:
 
         )
 
-        # ------------------------
-        # Website
-        # ------------------------
-
+        # Step 2: Find Official Website
         website = self.website_finder.find(
             company.company_name
         )
@@ -111,15 +107,13 @@ class UnderwritingAgent:
                     claim="Official company website could not be verified",
                     category="business_model",
                     source="Website Finder",
-                    confidence=0.0,
+                    confidence=1.0,
                     limitations="No reliable official website found"
                 )
             )
 
-        # ------------------------
-        # Trade Press
-        # ------------------------
 
+        # Step 3: Search Trade Press
         articles = self.trade_press.search_articles(
             company.company_name
         )
@@ -138,20 +132,27 @@ class UnderwritingAgent:
         for article in articles:
 
             state.evidence.extend(
-
                 self.evidence_builder.from_trade_press(
                     article
                 )
 
             )
 
-        # ------------------------
-        # Competition
-        # ------------------------
-
+        # Step 4: Research Competition
         competition_articles = self.competition.research(
             company.company_name
         )
+
+        if len(competition_articles) == 0:
+
+            state.evidence.append(
+                self.evidence_builder.create_evidence(
+                    claim="No usable competition sources were retrieved",
+                    category="competitive_landscape",
+                    source="Competition Research",
+                    confidence=1.0
+                )
+            )
 
         for article in competition_articles:
 
@@ -163,10 +164,7 @@ class UnderwritingAgent:
 
             )
 
-        # ------------------------
-        # Final Report
-        # ------------------------
-
+        # Step 5: Generate Final Report
 
         # report = self.report_generator.generate(
         #     state
