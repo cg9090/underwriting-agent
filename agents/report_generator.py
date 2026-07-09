@@ -18,7 +18,8 @@ class ReportGenerator:
 
     def generate(
         self,
-        state: ResearchState
+        state: ResearchState,
+        evidence_summary: dict
     ):
 
         evidence = ""
@@ -58,6 +59,15 @@ Every factual statement should reference its source.
 Company
 
 {state.company.company_name}
+
+IMPORTANT:
+The evidence strength summary represents how confident the system is in each section.
+Do not make strong conclusions where evidence strength is low.
+Explicitly mention limitations and uncertainty.
+
+Evidence Strength Summary:
+
+{evidence_summary}
 
 Evidence
 

@@ -1,3 +1,5 @@
+from collections import Counter
+
 from models.evidence import Evidence
 from models.research import ResearchState
 
@@ -163,11 +165,14 @@ class UnderwritingAgent:
                 )
 
             )
+        
+        evidence_summary = self.assess_evidence(state.evidence)
 
         # Step 5: Generate Final Report
 
         # report = self.report_generator.generate(
-        #     state
+        #     state,
+        #     evidence_summary
         # )
 
         return state
@@ -192,3 +197,43 @@ class UnderwritingAgent:
 
 
         return matches[choice]
+    
+    from collections import Counter
+
+    def assess_evidence(
+        self,
+        evidence: list[Evidence]
+    ):
+
+        MIN_EVIDENCE = {
+            "business_model": 5,
+            "competitive_landscape": 5,
+            "quality_signal": 5
+        }
+
+        counts = Counter(
+            item.category
+            for item in evidence
+        )
+
+        summary = {}
+
+        for category, minimum in MIN_EVIDENCE.items():
+
+            count = counts.get(category, 0)
+
+            if count >= minimum:
+                strength = "High"
+
+            elif count >= 3:
+                strength = "Moderate"
+
+            else:
+                strength = "Low"
+
+            summary[category] = {
+                "count": count,
+                "strength": strength
+            }
+
+        return summary
