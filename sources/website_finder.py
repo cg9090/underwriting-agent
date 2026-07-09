@@ -26,7 +26,6 @@ class WebsiteFinder:
         if not results:
             return None
 
-        # Prefer non-Wikipedia results
         for result in results:
 
             url = result["href"].lower()
