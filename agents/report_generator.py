@@ -31,12 +31,14 @@ Category: {item.category}
 Claim:
 {item.claim}
 
+Quote:
+{item.quote}
+
 Source:
 {item.source}
 
 Confidence:
 {item.confidence}
-
 
 URL:
 {item.url}
