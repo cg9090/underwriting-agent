@@ -1,6 +1,5 @@
 import os
 
-from anthropic import Anthropic
 from dotenv import load_dotenv
 
 from models.research import ResearchState
@@ -117,9 +116,9 @@ Mention conflicting evidence.
 
 # Sources
 
-List all sources used.
+List all sources used including the URLs
 """
 
-        response = self.client.generate(text=prompt)
+        response = self.client.generate(prompt=prompt)
 
         return response

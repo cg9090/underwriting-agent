@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from models.company import CompanyProfile
 from models.company_search import CompanySearchResult
+from config import get_secret
 
 load_dotenv()
 
@@ -12,7 +13,7 @@ class CompaniesHouseClient:
     BASE_URL = "https://api.company-information.service.gov.uk"
 
     def __init__(self):
-        self.api_key = os.getenv("COMPANIES_HOUSE_API_KEY")
+        self.api_key = get_secret("COMPANIES_HOUSE_API_KEY")
 
         if not self.api_key:
             raise ValueError("COMPANIES_HOUSE_API_KEY not found.")
@@ -54,7 +55,9 @@ class CompaniesHouseClient:
         return CompanyProfile(
             company_name=data["company_name"],
             company_number=data["company_number"],
+            company_description=data.get("description"),
             status=data.get("company_status"),
+            company_links=data.get("links", {}),
             incorporation_date=data.get("date_of_creation"),
             sic_codes=data.get("sic_codes", []),
             registered_address=str(

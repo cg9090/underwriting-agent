@@ -1,6 +1,5 @@
 from models.evidence import Evidence
 from models.article import Article
-from models.website import WebsiteContent
 
 class EvidenceBuilder:
 
@@ -39,6 +38,17 @@ class EvidenceBuilder:
                     category="business_model",
                     source="Companies House",
                     confidence=0.95
+                )
+            )
+
+        if company.company_description:
+
+            evidence.append(
+                Evidence(
+                    claim=f"Company description: {company.company_description}",
+                    category="business_model",
+                    source="Companies House",
+                    confidence=0.9
                 )
             )
 

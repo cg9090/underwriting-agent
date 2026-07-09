@@ -34,14 +34,10 @@ class UnderwritingAgent:
         self.evidence_builder = EvidenceBuilder(extractor)
 
         self.report_generator = ReportGenerator()
-
-
-    def investigate(
-        self,
-        company_input: str
-    ):
-
-        # Step 1: Resolve Company and gather Company House information
+    
+    def find_companies(self, company_input: str):
+        
+         # Step 1: Resolve Company and gather Company House information
         if company_input.isdigit():
 
             company = self.company_house.get_company(
@@ -49,31 +45,45 @@ class UnderwritingAgent:
             )
 
             if company is None:
-                return f"No company found with number '{company_input}'."
+                return []
+            
+            return [company]
+            
+        return self.company_house.search_company(company_input)
 
-        else:
+            
+    def investigate(
+        self,
+       company
+    ):
+            
+            # if len(matches) == 0:
 
-            matches = self.company_house.search_company(company_input)
+            #     return f"No companies found matching '{company_input}'."
 
-            if len(matches) == 0:
+            # if len(matches) > 1:
 
-                return f"No companies found matching '{company_input}'."
+            #     selected_company = self.choose_company(
+            #         matches
+            #     )
 
-            if len(matches) > 1:
+            # else:
 
-                selected_company = self.choose_company(
-                    matches
-                )
-
-            else:
-
-                selected_company = matches[0]
+            #     selected_company = matches[0]
 
 
-            company = self.company_house.get_company(
-                selected_company.company_number
-            )
+            # company = self.company_house.get_company(
+            #     selected_company.company_number
+            # )
 
+        if company.status != "active":
+
+            return {
+                f"Company is {company.status}. "
+                "Please select an active company."
+            }
+
+        print(company.company_description)
         state = ResearchState(company_name=company.company_name)
         state.company = company
 
@@ -170,12 +180,12 @@ class UnderwritingAgent:
 
         # Step 5: Generate Final Report
 
-        # report = self.report_generator.generate(
-        #     state,
-        #     evidence_summary
-        # )
+        report = self.report_generator.generate(
+            state,
+            evidence_summary
+        )
 
-        return state
+        return report
     
     def choose_company(self, matches):
 
