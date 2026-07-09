@@ -1,4 +1,8 @@
 requests
-dotenv
+python-dotenv
 pydantic
 ddgs
+beautifulsoup4
+lxml
+anthropic
+streamlit
