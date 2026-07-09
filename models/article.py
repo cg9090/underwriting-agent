@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class TradePressArticle(BaseModel):
+class Article(BaseModel):
     title: str
     url: str
     content: str
